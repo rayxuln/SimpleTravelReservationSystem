@@ -3,23 +3,20 @@ package com.raiix.travelreservationsystem.window;
 import com.raiix.travelreservationsystem.App;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
-public class MainWindow extends JFrame implements WindowListener {
-
-    JPanel mainPanel;
-    private JTabbedPane tabbedPane;
-
+public class MainWindow extends JFrame {
     App app;
 
     private void generateGUI(){
-        mainPanel = new JPanel();
+        JPanel mainPanel = new JPanel();
         BoxLayout boxLayout = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
         mainPanel.setLayout(boxLayout);
 
-        tabbedPane = new JTabbedPane();
+        JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("数据管理", new DataManagePanel(app));
-        tabbedPane.addTab("预定", new JPanel());
+        tabbedPane.addTab("预定", new ReservationPanel(app));
         tabbedPane.addTab("预定查询", new JPanel());
 
         mainPanel.add(tabbedPane);
@@ -32,42 +29,22 @@ public class MainWindow extends JFrame implements WindowListener {
         app = _app;
         generateGUI();
 
-        addWindowListener(this);
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-//        setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        enableEvents(AWTEvent.WINDOW_EVENT_MASK);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public void windowOpened(WindowEvent e) {
-
-    }
-
-    public void windowClosing(WindowEvent e) {
-        int n = JOptionPane.showConfirmDialog(
-                this,
-                "要退出本系统吗？",
-                "提示",
-                JOptionPane.YES_NO_OPTION);
-        if (n == 0)
-            app.quit();
-    }
-
-    public void windowClosed(WindowEvent e) {
-        app.quit();
-    }
-
-    public void windowIconified(WindowEvent e) {
-
-    }
-
-    public void windowDeiconified(WindowEvent e) {
-
-    }
-
-    public void windowActivated(WindowEvent e) {
-
-    }
-
-    public void windowDeactivated(WindowEvent e) {
-
+    @Override
+    protected void processWindowEvent(WindowEvent e) {
+        if(e.getID() == WindowEvent.WINDOW_CLOSING)
+        {
+            int n = JOptionPane.showConfirmDialog(
+                    this,
+                    "要退出本系统吗？",
+                    "提示",
+                    JOptionPane.YES_NO_OPTION);
+            if (n != 0)
+                return;
+        }
+        super.processWindowEvent(e);
     }
 }
