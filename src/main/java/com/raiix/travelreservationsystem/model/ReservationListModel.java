@@ -36,6 +36,22 @@ public class ReservationListModel extends AbstractListModel {
         refresh();
     }
 
+    public boolean has(int type, String key)
+    {
+        try {
+            ResultSet rs = app.MySql().prepare("select * from "+tableName+" where custID=? and type=? and `key`=?;")
+                                    .setInt(customerID)
+                                    .setInt(type)
+                                    .setString(key)
+                                    .execute();
+            if(rs.next())
+                return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public void refresh(){
         try {
             resultSet = app.MySql().prepare("select * from "+tableName+" where custID=?;")
@@ -52,8 +68,9 @@ public class ReservationListModel extends AbstractListModel {
         }
     }
 
-    public void book(int type, String key) throws BasicTableModel.InvalidAvailDeltaException{
+    public void book(int type, String key) throws BasicTableModel.InvalidAvailDeltaException, RecordAlreadyExistException{
         try {
+            if(has(type, key)) throw new RecordAlreadyExistException();
 
             try {
                 switch (type)
@@ -92,6 +109,7 @@ public class ReservationListModel extends AbstractListModel {
     {
         try {
             resultSet.absolute(index+1);
+            if(resultSet.isAfterLast()) return;
             unbook(resultSet.getInt(2), resultSet.getString(3));
         } catch (SQLException e)
         {
@@ -119,8 +137,7 @@ public class ReservationListModel extends AbstractListModel {
                 return;
             }
 
-
-            app.MySql().prepare("delete from " + tableName + " where custID=? and type=? and key=?;")
+            app.MySql().prepare("delete from " + tableName + " where custID=? and type=? and `key`=?;")
                     .setInt(customerID)
                     .setInt(type)
                     .setString(key)
@@ -141,11 +158,26 @@ public class ReservationListModel extends AbstractListModel {
     public Object getElementAt(int index) {
         try {
             resultSet.absolute(index+1);
-            return resultSet.getString(3);
+            int type = resultSet.getInt(2);
+            String key = resultSet.getString(3);
+            switch (type)
+            {
+                case FLIGHT:
+                    String from = app.flightTableModel.getFromCity(key);
+                    String to = app.flightTableModel.getArivCity(key);
+                    return "从 "+from+" 到 "+to+" 的航班"+key;
+                case BUS:
+                    return key + " 的巴士";
+                case HOTEL:
+                    return key + " 的宾馆";
+            }
+            return "无效的预定信息";
         }catch (SQLException e)
         {
             e.printStackTrace();
         }
         return null;
     }
+
+    public static class RecordAlreadyExistException extends Exception {};
 }

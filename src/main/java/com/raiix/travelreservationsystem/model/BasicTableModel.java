@@ -116,7 +116,7 @@ public abstract class BasicTableModel extends AbstractTableModel {
     {
         try {
             int row = 0;
-            resultSet.first();
+            resultSet.beforeFirst();
             while (resultSet.next())
             {
                 if(resultSet.getString(1) == key)
@@ -161,6 +161,8 @@ public abstract class BasicTableModel extends AbstractTableModel {
                         .execute();
 
             refresh();
+
+            //fireTableChanged(new AvailChangedTableModelEvent(this));
         }catch (SQLException e)
         {
             e.printStackTrace();
@@ -169,6 +171,13 @@ public abstract class BasicTableModel extends AbstractTableModel {
 
     public static class InvalidKeyException extends Exception { }
     public static class InvalidAvailDeltaException extends Exception { }
+
+    public static class AvailChangedTableModelEvent extends TableModelEvent {
+        public AvailChangedTableModelEvent(TableModel source) {
+            super(source);
+        }
+    }
+
 
     public static class InvalidChangedKeyTableModelEvent extends TableModelEvent {
         public InvalidChangedKeyTableModelEvent(TableModel source, int firstRow, int lastRow, int column) {

@@ -5,10 +5,7 @@ import com.raiix.travelreservationsystem.model.*;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.*;
@@ -82,13 +79,6 @@ public class ReservationPanel extends JPanel {
         busDataTable.setDragEnabled(false);
         tabbedPane.addTab("宾馆", new JScrollPane(hotelsDataTable));
 
-        tabbedPane.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                update();
-            }
-        });
-
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
         gridBagConstraints.weightx = 1;
@@ -153,8 +143,8 @@ public class ReservationPanel extends JPanel {
             }
         });
 
-        final JPopupMenu bookPopupMenu = new JPopupMenu("reservation");
-        JMenuItem menuItem = new JMenuItem("预定");
+        final JPopupMenu bookPopupMenu = new JPopupMenu("预订菜单");
+        JMenuItem menuItem = new JMenuItem("预订");
         menuItem.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -179,7 +169,15 @@ public class ReservationPanel extends JPanel {
                 }
 
                 try{
-                    app.reservationListModel.book(type, (String) m.getValueAt(row, 0));
+                    app.reservationListModel.book(type, (String) currentTable.getValueAt(row, 0));
+                    currentTable.clearSelection();
+
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "预定成功！",
+                            "提示",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
                 } catch (BasicTableModel.InvalidAvailDeltaException invalidAvailDeltaException) {
                     JOptionPane.showMessageDialog(
                             null,
@@ -187,7 +185,13 @@ public class ReservationPanel extends JPanel {
                             "错误",
                             JOptionPane.ERROR_MESSAGE
                     );
-                    currentTable.clearSelection();
+                } catch (ReservationListModel.RecordAlreadyExistException recordAlreadyExistException) {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "该项目已经预定了！",
+                            "错误",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         });
@@ -218,15 +222,71 @@ public class ReservationPanel extends JPanel {
         flightsDataTable.addMouseListener(mouseAdapter);
         busDataTable.addMouseListener(mouseAdapter);
         hotelsDataTable.addMouseListener(mouseAdapter);
+
+        final JPopupMenu unbookMenu = new JPopupMenu("取消预定菜单");
+        menuItem = new JMenuItem("取消预定");
+        unbookMenu.add(menuItem);
+        menuItem.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int id = reservationList.getSelectedIndex();
+                try {
+                    app.reservationListModel.unbook(id);
+                    reservationList.clearSelection();
+
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "取消预定成功！",
+                            "提示",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                } catch (BasicTableModel.InvalidAvailDeltaException ignore) { }
+            }
+        });
+
+        mouseAdapter = new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if(e.getButton() == MouseEvent.BUTTON3)
+                {
+                    if(reservationList.getSelectedIndices().length > 0)
+                        unbookMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        };
+        reservationList.addMouseListener(mouseAdapter);
+
+        app.reservationListModel.addListDataListener(new ListDataListener() {
+            public void update(){
+
+            }
+
+
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+                update();
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+                update();
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+                update();
+            }
+        });
     }
 
-    private class WrappedTableModel extends AbstractTableModel {
+    private class WrappedTableModel extends AbstractTableModel implements TableModelListener {
 
         BasicTableModel model;
 
         public WrappedTableModel(BasicTableModel m)
         {
             model = m;
+            model.addTableModelListener(this);
         }
 
         public BasicTableModel getModel(){
@@ -263,5 +323,9 @@ public class ReservationPanel extends JPanel {
             model.setValueAt(aValue, rowIndex, columnIndex);
         }
 
+        @Override
+        public void tableChanged(TableModelEvent e) {
+            fireTableChanged(e);
+        }
     }
 }
