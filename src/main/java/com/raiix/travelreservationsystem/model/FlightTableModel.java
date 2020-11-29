@@ -6,15 +6,6 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 public class FlightTableModel extends BasicTableModel {
-    public FlightTableModel(App a, boolean e) {
-        super(a, e);
-        columns_name = new String[]{"航班号", "价格", "座位数", "剩余座位数", "起飞地", "目的地"};
-
-        tableName = "flights";
-        primaryKey = "flightNum";
-
-        refresh();
-    }
     public FlightTableModel(App a) {
         super(a, true);
         columns_name = new String[]{"航班号", "价格", "座位数", "剩余座位数", "起飞地", "目的地"};

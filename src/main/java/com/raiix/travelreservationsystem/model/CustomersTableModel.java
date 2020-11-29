@@ -7,15 +7,6 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 public class CustomersTableModel extends BasicTableModel {
-    public CustomersTableModel(App a, boolean e) {
-        super(a, e);
-        columns_name = new String[]{"编号", "姓名"};
-
-        tableName = "customers";
-        primaryKey = "id";
-
-        refresh();
-    }
 
     public CustomersTableModel(App a) {
         super(a, true);

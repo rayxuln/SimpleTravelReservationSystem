@@ -6,15 +6,6 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 public class HotelsTableModel extends BasicTableModel {
-    public HotelsTableModel(App a, boolean e) {
-        super(a, e);
-        columns_name = new String[]{"地方名", "价格", "房间数", "剩余房间数"};
-
-        tableName = "hotels";
-        primaryKey = "location";
-
-        refresh();
-    }
     public HotelsTableModel(App a) {
         super(a, true);
         columns_name = new String[]{"地方名", "价格", "房间数", "剩余房间数"};

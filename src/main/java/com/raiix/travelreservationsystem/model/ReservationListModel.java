@@ -55,12 +55,6 @@ public class ReservationListModel extends AbstractListModel {
     public void book(int type, String key) throws BasicTableModel.InvalidAvailDeltaException{
         try {
 
-            app.MySql().prepare("insert into "+tableName+" values(?,?,?)")
-                    .setInt(customerID)
-                    .setInt(type)
-                    .setString(key)
-                    .execute();
-
             try {
                 switch (type)
                 {
@@ -79,6 +73,12 @@ public class ReservationListModel extends AbstractListModel {
                 e.printStackTrace();
                 return;
             }
+
+            app.MySql().prepare("insert into "+tableName+" values(?,?,?)")
+                    .setInt(customerID)
+                    .setInt(type)
+                    .setString(key)
+                    .execute();
 
             refresh();
         }catch (SQLIntegrityConstraintViolationException ignore) { }

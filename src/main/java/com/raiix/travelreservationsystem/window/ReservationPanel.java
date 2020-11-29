@@ -9,6 +9,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -28,9 +29,7 @@ public class ReservationPanel extends JPanel {
 
     public void update(){
         customerIDTextField.setText("");
-        ((BasicTableModel)flightsDataTable.getModel()).refresh();
-        ((BasicTableModel)busDataTable.getModel()).refresh();
-        ((BasicTableModel)hotelsDataTable.getModel()).refresh();
+        ((ReservationListModel)reservationList.getModel()).setCustomerID(-1);
     }
 
     private void generateGUI(){
@@ -68,17 +67,17 @@ public class ReservationPanel extends JPanel {
         //添加表格
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        flightsDataTable = new JTable(new FlightTableModel(app, false));
+        flightsDataTable = new JTable(new WrappedTableModel(app.flightTableModel));
         flightsDataTable.setAutoCreateRowSorter(true);
         flightsDataTable.setDragEnabled(false);
         tabbedPane.addTab("航班", new JScrollPane(flightsDataTable));
 
-        busDataTable = new JTable(new BusTableModel(app, false));
+        busDataTable = new JTable(new WrappedTableModel(app.busTableModel));
         busDataTable.setAutoCreateRowSorter(true);
         busDataTable.setDragEnabled(false);
         tabbedPane.addTab("大巴", new JScrollPane(busDataTable));
 
-        hotelsDataTable = new JTable(new HotelsTableModel(app, false));
+        hotelsDataTable = new JTable(new WrappedTableModel(app.hotelsTableModel));
         busDataTable.setAutoCreateRowSorter(true);
         busDataTable.setDragEnabled(false);
         tabbedPane.addTab("宾馆", new JScrollPane(hotelsDataTable));
@@ -159,7 +158,7 @@ public class ReservationPanel extends JPanel {
         menuItem.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                BasicTableModel m = (BasicTableModel) currentTable.getModel();
+                BasicTableModel m = (BasicTableModel) ((WrappedTableModel)currentTable.getModel()).getModel();
                 int row = currentTable.getSelectedRow();
                 int type = 0;
                 if(m instanceof FlightTableModel)
@@ -188,6 +187,7 @@ public class ReservationPanel extends JPanel {
                             "错误",
                             JOptionPane.ERROR_MESSAGE
                     );
+                    currentTable.clearSelection();
                 }
             }
         });
@@ -218,5 +218,50 @@ public class ReservationPanel extends JPanel {
         flightsDataTable.addMouseListener(mouseAdapter);
         busDataTable.addMouseListener(mouseAdapter);
         hotelsDataTable.addMouseListener(mouseAdapter);
+    }
+
+    private class WrappedTableModel extends AbstractTableModel {
+
+        BasicTableModel model;
+
+        public WrappedTableModel(BasicTableModel m)
+        {
+            model = m;
+        }
+
+        public BasicTableModel getModel(){
+            return model;
+        }
+
+        @Override
+        public int getRowCount() {
+            return model.getRowCount();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return model.getColumnCount();
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            return model.getValueAt(rowIndex, columnIndex);
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return false;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return model.getColumnName(column);
+        }
+
+        @Override
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            model.setValueAt(aValue, rowIndex, columnIndex);
+        }
+
     }
 }
