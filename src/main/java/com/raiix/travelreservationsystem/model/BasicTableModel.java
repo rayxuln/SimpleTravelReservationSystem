@@ -119,9 +119,10 @@ public abstract class BasicTableModel extends AbstractTableModel {
             resultSet.beforeFirst();
             while (resultSet.next())
             {
-                if(resultSet.getString(1) == key)
+                if(resultSet.getString(1).equals(key))
                 {
                     row = resultSet.getRow()-1;
+                    break;
                 }
             }
 

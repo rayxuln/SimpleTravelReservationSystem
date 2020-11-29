@@ -57,4 +57,10 @@ public class CustomersTableModel extends BasicTableModel {
         }
         return null;
     }
+
+    @Override
+    public void remove(String key) {
+        (new ReservationListModel(app, Integer.parseInt(key))).unbookAll();
+        super.remove(key);
+    }
 }

@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.ArrayList;
 
 public class ReservationListModel extends AbstractListModel {
 
@@ -115,6 +116,31 @@ public class ReservationListModel extends AbstractListModel {
         {
             e.printStackTrace();
         }
+    }
+
+    public void unbookAll()
+    {
+        try {
+            ArrayList<Integer> type_list = new ArrayList<Integer>();
+            ArrayList<String> key_list = new ArrayList<String>();
+
+            resultSet.beforeFirst();
+            while (resultSet.next())
+            {
+                type_list.add(resultSet.getInt(2));
+                key_list.add(resultSet.getString(3));
+            }
+
+            for(int i=0; i<type_list.size(); ++i)
+            {
+                unbook(type_list.get(i), key_list.get(i));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (BasicTableModel.InvalidAvailDeltaException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void unbook(int type, String key) throws BasicTableModel.InvalidAvailDeltaException
