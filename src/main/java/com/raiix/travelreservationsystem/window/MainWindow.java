@@ -1,13 +1,21 @@
 package com.raiix.travelreservationsystem.window;
 
 import com.raiix.travelreservationsystem.App;
+import com.raiix.travelreservationsystem.model.BasicTableModel;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import java.awt.*;
 import java.awt.event.*;
 
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame implements TableModelListener {
     App app;
+
+    DataManagePanel dataManagePanel;
+    ReservationPanel reservationPanel;
 
     private void generateGUI(){
         JPanel mainPanel = new JPanel();
@@ -15,8 +23,10 @@ public class MainWindow extends JFrame {
         mainPanel.setLayout(boxLayout);
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("数据管理", new DataManagePanel(app));
-        tabbedPane.addTab("预定", new ReservationPanel(app));
+        dataManagePanel = new DataManagePanel(app);
+        tabbedPane.addTab("数据管理", dataManagePanel);
+        reservationPanel = new ReservationPanel(app);
+        tabbedPane.addTab("预定", reservationPanel);
         tabbedPane.addTab("预定查询", new JPanel());
 
         mainPanel.add(tabbedPane);
@@ -29,8 +39,18 @@ public class MainWindow extends JFrame {
         app = _app;
         generateGUI();
 
+        app.flightTableModel.addTableModelListener(this);
+        app.busTableModel.addTableModelListener(this);
+        app.hotelsTableModel.addTableModelListener(this);
+        app.customersTableModel.addTableModelListener(this);
+
         enableEvents(AWTEvent.WINDOW_EVENT_MASK);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    @Override
+    public void tableChanged(TableModelEvent e) {
+        reservationPanel.update();
     }
 
     @Override

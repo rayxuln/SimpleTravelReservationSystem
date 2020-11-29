@@ -6,8 +6,19 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 public class BusTableModel  extends BasicTableModel {
+    public BusTableModel(App a, boolean e)
+    {
+        super(a, e);
+        columns_name = new String[]{"地方名", "价格", "座位数", "剩余座位数"};
+
+        tableName = "bus";
+        primaryKey = "location";
+
+        refresh();
+    }
+
     public BusTableModel(App a) {
-        super(a);
+        super(a, true);
         columns_name = new String[]{"地方名", "价格", "座位数", "剩余座位数"};
 
         tableName = "bus";

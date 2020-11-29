@@ -129,10 +129,10 @@ public class DataManagePanel extends JPanel implements TableModelListener {
 
         dataTable.addMouseListener( new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseReleased(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON3) {
                     deleteMenuItem.setEnabled(dataTable.getSelectedRowCount() > 0);
-                    dataTableMenu.show((JPanel) e.getSource(), e.getX(), e.getY());
+                    dataTableMenu.show(dataTable, e.getX(), e.getY());
                 }
             }
         });

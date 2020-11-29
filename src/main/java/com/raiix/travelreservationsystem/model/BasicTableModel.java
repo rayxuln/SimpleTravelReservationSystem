@@ -24,15 +24,18 @@ public abstract class BasicTableModel extends AbstractTableModel {
     protected String tableName;
     protected String primaryKey;
 
-    public BasicTableModel(App a)
+    protected boolean editable;
+
+    public BasicTableModel(App a, boolean e)
     {
         app = a;
         columns = new Vector<String>();
+        editable = e;
     }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return true;
+        return editable;
     }
 
     public void refresh(){
@@ -134,6 +137,38 @@ public abstract class BasicTableModel extends AbstractTableModel {
             e.printStackTrace();
         }
     }
+
+    public void updateAvail(String key, int delta) throws InvalidKeyException, InvalidAvailDeltaException
+    {
+        try {
+            ResultSet rs = app.MySql().prepare("select num, avail from "+tableName+" where "+primaryKey+"=?;")
+                                        .setString(key)
+                                        .execute();
+            if(!rs.next())
+                throw new InvalidKeyException();
+            int num =rs.getInt(1);
+            int avail = rs.getInt(2);
+            int new_avail = avail + delta;
+
+            if(new_avail < 0 || new_avail > num)
+            {
+                throw new InvalidAvailDeltaException();
+            }
+
+            app.MySql().prepare("update "+tableName+" set avail=? where "+primaryKey+"=?;")
+                        .setInt(new_avail)
+                        .setString(key)
+                        .execute();
+
+            refresh();
+        }catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static class InvalidKeyException extends Exception { }
+    public static class InvalidAvailDeltaException extends Exception { }
 
     public static class InvalidChangedKeyTableModelEvent extends TableModelEvent {
         public InvalidChangedKeyTableModelEvent(TableModel source, int firstRow, int lastRow, int column) {

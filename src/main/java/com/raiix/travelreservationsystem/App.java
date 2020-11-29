@@ -1,9 +1,6 @@
 package com.raiix.travelreservationsystem;
 
-import com.raiix.travelreservationsystem.model.BusTableModel;
-import com.raiix.travelreservationsystem.model.CustomersTableModel;
-import com.raiix.travelreservationsystem.model.FlightTableModel;
-import com.raiix.travelreservationsystem.model.HotelsTableModel;
+import com.raiix.travelreservationsystem.model.*;
 import com.raiix.travelreservationsystem.window.MainWindow;
 
 import java.sql.SQLException;
@@ -20,6 +17,7 @@ public class App {
     public BusTableModel busTableModel;
     public HotelsTableModel hotelsTableModel;
     public CustomersTableModel customersTableModel;
+    public ReservationListModel reservationListModel;
 
     public void run(String[] args) {
 
@@ -34,13 +32,10 @@ public class App {
 
         // init models
         flightTableModel = new FlightTableModel(this);
-        flightTableModel.refresh();
         busTableModel = new BusTableModel(this);
-        busTableModel.refresh();
         hotelsTableModel = new HotelsTableModel(this);
-        hotelsTableModel.refresh();
         customersTableModel = new CustomersTableModel(this);
-        customersTableModel.refresh();
+        reservationListModel = new ReservationListModel(this, -1);
 
         mainWindow = new MainWindow(this);
         mainWindow.setVisible(true);
