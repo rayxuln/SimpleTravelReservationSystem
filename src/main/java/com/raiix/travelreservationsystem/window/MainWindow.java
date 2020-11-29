@@ -1,11 +1,8 @@
 package com.raiix.travelreservationsystem.window;
 
 import com.raiix.travelreservationsystem.App;
-import com.raiix.travelreservationsystem.model.BasicTableModel;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import java.awt.*;
@@ -16,6 +13,7 @@ public class MainWindow extends JFrame implements TableModelListener {
 
     DataManagePanel dataManagePanel;
     ReservationPanel reservationPanel;
+    ReservationInspectPanel reservationInspectPanel;
 
     private void generateGUI(){
         JPanel mainPanel = new JPanel();
@@ -27,7 +25,8 @@ public class MainWindow extends JFrame implements TableModelListener {
         tabbedPane.addTab("数据管理", dataManagePanel);
         reservationPanel = new ReservationPanel(app);
         tabbedPane.addTab("预定", reservationPanel);
-        tabbedPane.addTab("预定查询", new JPanel());
+        reservationInspectPanel = new ReservationInspectPanel(app);
+        tabbedPane.addTab("预定查询", reservationInspectPanel);
 
         mainPanel.add(tabbedPane);
         add(mainPanel);
@@ -51,6 +50,7 @@ public class MainWindow extends JFrame implements TableModelListener {
     @Override
     public void tableChanged(TableModelEvent e) {
         reservationPanel.update();
+        reservationInspectPanel.update();
     }
 
     @Override

@@ -19,6 +19,7 @@ public class ReservationPanel extends JPanel {
     JTable hotelsDataTable;
 
     JList reservationList;
+    ReservationListModel reservationListModel;
 
     JTable currentTable;
 
@@ -95,7 +96,7 @@ public class ReservationPanel extends JPanel {
         panel.setBorder(new LineBorder(Color.BLACK));
         label = new JLabel("已预定");
         panel.add(label);
-        reservationList = new JList(app.reservationListModel);
+        reservationList = new JList(reservationListModel);
         panel.add(new JScrollPane(reservationList));
 
         splitPane.setRightComponent(panel);
@@ -103,6 +104,7 @@ public class ReservationPanel extends JPanel {
 
     public ReservationPanel(App _app) {
         app = _app;
+        reservationListModel = new ReservationListModel(app, -1);
         generateGUI();
 
         customerIDTextField.getDocument().addDocumentListener(new DocumentListener() {
@@ -169,7 +171,7 @@ public class ReservationPanel extends JPanel {
                 }
 
                 try{
-                    app.reservationListModel.book(type, (String) currentTable.getValueAt(row, 0));
+                    reservationListModel.book(type, (String) currentTable.getValueAt(row, 0));
                     currentTable.clearSelection();
 
                     JOptionPane.showMessageDialog(
@@ -231,7 +233,7 @@ public class ReservationPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 int id = reservationList.getSelectedIndex();
                 try {
-                    app.reservationListModel.unbook(id);
+                    reservationListModel.unbook(id);
                     reservationList.clearSelection();
 
                     JOptionPane.showMessageDialog(
@@ -256,9 +258,9 @@ public class ReservationPanel extends JPanel {
         };
         reservationList.addMouseListener(mouseAdapter);
 
-        app.reservationListModel.addListDataListener(new ListDataListener() {
+        reservationListModel.addListDataListener(new ListDataListener() {
             public void update(){
-
+                app.mainWindow.reservationInspectPanel.update();
             }
 
 

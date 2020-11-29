@@ -124,19 +124,12 @@ public class ReservationListModel extends AbstractListModel {
             ArrayList<Integer> type_list = new ArrayList<Integer>();
             ArrayList<String> key_list = new ArrayList<String>();
 
-            resultSet.beforeFirst();
-            while (resultSet.next())
-            {
-                type_list.add(resultSet.getInt(2));
-                key_list.add(resultSet.getString(3));
-            }
+            getTypeKeyList(type_list, key_list);
 
             for(int i=0; i<type_list.size(); ++i)
             {
                 unbook(type_list.get(i), key_list.get(i));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         } catch (BasicTableModel.InvalidAvailDeltaException e) {
             e.printStackTrace();
         }
@@ -203,6 +196,20 @@ public class ReservationListModel extends AbstractListModel {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void getTypeKeyList(ArrayList<Integer> type_list, ArrayList<String> key_list)
+    {
+        try {
+            resultSet.beforeFirst();
+            while (resultSet.next())
+            {
+                type_list.add(resultSet.getInt(2));
+                key_list.add(resultSet.getString(3));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static class RecordAlreadyExistException extends Exception {};

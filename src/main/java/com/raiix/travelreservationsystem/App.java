@@ -17,7 +17,7 @@ public class App {
     public BusTableModel busTableModel;
     public HotelsTableModel hotelsTableModel;
     public CustomersTableModel customersTableModel;
-    public ReservationListModel reservationListModel;
+
 
     public void run(String[] args) {
 
@@ -35,7 +35,7 @@ public class App {
         busTableModel = new BusTableModel(this);
         hotelsTableModel = new HotelsTableModel(this);
         customersTableModel = new CustomersTableModel(this);
-        reservationListModel = new ReservationListModel(this, -1);
+
 
         mainWindow = new MainWindow(this);
         mainWindow.setVisible(true);
